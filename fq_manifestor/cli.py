@@ -33,7 +33,8 @@ def main(
         str,
         typer.Option(
             "--sample-id-pattern",
-            help="Regex with a capture group used to extract the sample ID from filenames.",
+            help=("Regex with a capture group used to extract the sample ID "
+                  "from filenames. Ignored when --metadata is provided."),
         ),
     ] = "(.*?)_",
     f_read_pattern: Annotated[
@@ -57,6 +58,14 @@ def main(
             help="Optional substring; only files containing this string are included.",
         ),
     ] = None,
+    metadata: Annotated[
+        Optional[str],
+        typer.Option(
+            "--metadata",
+            help=("Optional metadata TSV whose sample IDs are matched literally "
+                  "against filenames instead of using --sample-id-pattern."),
+        ),
+    ] = None,
     verbose: Annotated[
         bool,
         typer.Option(
@@ -64,6 +73,15 @@ def main(
             help="Print progress messages.",
         ),
     ] = True,
+    use_pwd: Annotated[
+        bool,
+        typer.Option(
+            "--use-pwd",
+            help=("Write read paths using literal $PWD plus paths relative to "
+                  "the current directory, instead of absolute paths. Applies "
+                  "to the manifest and unmatched-files report."),
+        ),
+    ] = False,
 ) -> None:
     extensions = [e.strip() for e in fq_extensions.split(",") if e.strip()]
 
@@ -75,11 +93,19 @@ def main(
         f_read_pattern=f_read_pattern,
         r_read_pattern=r_read_pattern,
         filter_pattern=filter_pattern,
+        metadata=metadata,
         verbose=verbose,
+        use_pwd=use_pwd,
     )
 
     abs_output_fp = os.path.abspath(output_fp)
-    typer.echo("To import, try running:")
+    if use_pwd:
+        typer.echo(
+            "To import, run from this directory or one with the same relative "
+            "read paths:"
+        )
+    else:
+        typer.echo("To import, try running:")
     typer.echo(
         f"qiime tools import "
         f"--type 'SampleData[PairedEndSequencesWithQuality]' "
