@@ -11,7 +11,11 @@ _MISSING_FILES_FILENAME = 'files-missing-from-md.tsv'
 
 
 def _pwd_relative_path(filepath):
-    """Defer the working-directory prefix until QIIME reads the manifest."""
+    '''
+    Use the shell variable $PWD instead of an absolute path. Useful for
+    nextflow integration, where absolute paths built in one nextflow process
+    will not be available in the next process.
+    '''
     return os.path.join('$PWD', os.path.relpath(filepath))
 
 
