@@ -1,0 +1,9 @@
+**
+!Dockerfile
+!pyproject.toml
+!README.md
+!LICENSE
+!fq_manifestor/
+!fq_manifestor/**
+**/__pycache__/
+**/*.py[cod]
